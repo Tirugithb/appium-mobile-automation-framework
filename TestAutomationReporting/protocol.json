@@ -1,0 +1,306 @@
+[
+  {
+    "step": "Verifying the required applications are installed successfully",
+    "cases": [
+      "Apps_Installed_1"
+    ]
+  },
+  {
+    "step": "Verifying the background applications screen",
+    "cases": [
+      "Background_Apps"
+    ]
+  },
+  {
+    "step": "Verifying the Hub Enrollment details screen",
+    "cases": [
+      "Hub_Enrollment_Details"
+    ]
+  },
+  {
+    "step": "Verifying the Capture About Screen",
+    "cases": [
+      "S2_SynchroMed_II_TestCase1_About_Screen",
+      "S2_SynchroMed_III_TestCase1_About_Screen",
+      "S5e_SynchroMed_II_TestCase1_About_Screen",
+      "S5e_SynchroMed_III_TestCase1_About_Screen",
+      "A4P_SynchroMed_II_TestCase1_About_Screen",
+      "A4P_SynchroMed_III_TestCase1_About_Screen",
+
+      "S2_Stim_Trialing_TestCase1_About_Screen",
+      "S5e_Stim_Trialing_TestCase1_About_Screen",
+      "A4P_Stim_Trialing_TestCase1_About_Screen",
+
+      "S2_Vanta_TestCase1_About_Screen",
+      "S5e_Vanta_TestCase1_About_Screen",
+      "A4P_Vanta_TestCase1_About_Screen",
+
+      "S2_Restore_TestCase1_About_Screen",
+      "S5e_Restore_TestCase1_About_Screen",
+      "A4P_Restore_TestCase1_About_Screen",
+
+      "S2_Intellis_TestCase1_About_Screen",
+      "S5e_Intellis_TestCase1_About_Screen",
+      "A4P_Intellis_TestCase1_About_Screen",
+
+      "S2_Inceptiv_TestCase1_About_Screen",
+      "S5e_Inceptiv_TestCase1_About_Screen",
+      "A4P_Inceptiv_TestCase1_About_Screen",
+
+      "S2_Percept_PC_DBS_TestCase1_About_Screen",
+      "S5e_Percept_PC_DBS_TestCase1_About_Screen",
+      "A4P_Percept_PC_DBS_TestCase1_About_Screen",
+
+      "S2_Percept_RC_DBS_TestCase1_About_Screen",
+      "S5e_Percept_RC_DBS_TestCase1_About_Screen",
+      "A4P_Percept_RC_DBS_TestCase1_About_Screen",
+
+      "A4P_Altaviva_TestCase2_About_Screen1",
+      "A4P_Altaviva_TestCase2_About_Screen2",
+
+      "S2_SureTune_TestCase6_About_Screen",
+      "S5e_SureTune_TestCase6_About_Screen",
+      "A4P_SureTune_TestCase6_About_Screen",
+
+      "S2_DBS_TestCase6_ST_About_Screen",
+      "S5e_DBS_TestCase6_ST_About_Screen",
+      "A4P_DBS_TestCase6_ST_About_Screen",
+
+      "S2_DBS_PatientDemo_TestCase7_About_Screen",
+      "S5e_DBS_PatientDemo_TestCase7_About_Screen",
+      "A4P_DBS_PatientDemo_TestCase7_About_Screen"
+    ]
+  },
+  {
+    "step": "Verify the Capture home screen and therapy after the connection is established",
+    "cases": [
+      "S2_SynchroMed_II_TestCase1_Home_Screen",
+      "S2_SynchroMed_III_TestCase1_Home_Screen",
+      "S5e_SynchroMed_II_TestCase1_Home_Screen",
+      "S5e_SynchroMed_III_TestCase1_Home_Screen",
+      "A4P_SynchroMed_II_TestCase1_Home_Screen",
+      "A4P_SynchroMed_III_TestCase1_Home_Screen",
+
+      "S2_Vanta_TestCase1_Home_Screen",
+      "S5e_Vanta_TestCase1_Home_Screen",
+      "A4P_Vanta_TestCase1_Home_Screen",
+
+      "S2_Restore_TestCase1_Home_Screen",
+      "S5e_Restore_TestCase1_Home_Screen",
+      "A4P_Restore_TestCase1_Home_Screen",
+
+      "S2_Intellis_TestCase1_Home_Screen",
+      "S5e_Intellis_TestCase1_Home_Screen",
+      "A4P_Intellis_TestCase1_Home_Screen",
+
+      "S2_Inceptiv_TestCase1_Home_Screen",
+      "S5e_Inceptiv_TestCase1_Home_Screen",
+      "A4P_Inceptiv_TestCase1_Home_Screen",
+
+      "S2_Percept_PC_DBS_TestCase1_Home_Screen",
+      "S5e_Percept_PC_DBS_TestCase1_Home_Screen",
+      "A4P_Percept_PC_DBS_TestCase1_Home_Screen",
+
+      "S2_Percept_RC_DBS_TestCase1_Home_Screen",
+      "S5e_Percept_RC_DBS_TestCase1_Home_Screen",
+      "A4P_Percept_RC_DBS_TestCase1_Home_Screen",
+
+      "A4P_Altaviva_TestCase2_HomeScreen",
+
+      "S2_SureTune_TestCase6_Home_Screen",
+      "S5e_SureTune_TestCase6_Home_Screen",
+      "A4P_SureTune_TestCase6_Home_Screen",
+
+      "S2_DBS_PatientDemo_TestCase7_Home_Screen",
+      "S5e_DBS_PatientDemo_TestCase7_Home_Screen",
+      "A4P_DBS_PatientDemo_TestCase7_Home_Screen"
+    ]
+  },
+  {
+    "step": "Verify the Capture stimulation screen and therapy after the connection is established",
+    "cases": [
+      "S2_Vanta_TestCase1_Stimulation_Screen",
+      "S5e_Vanta_TestCase1_Stimulation_Screen",
+      "A4P_Vanta_TestCase1_Stimulation_Screen",
+
+      "S2_Restore_TestCase1_Stimulation_Screen",
+      "S5e_Restore_TestCase1_Stimulation_Screen",
+      "A4P_Restore_TestCase1_Stimulation_Screen",
+
+      "S2_Intellis_TestCase1_Stimulation_Screen",
+      "S5e_Intellis_TestCase1_Stimulation_Screen",
+      "A4P_Intellis_TestCase1_Stimulation_Screen",
+
+      "S2_Inceptiv_TestCase1_Stimulation_Screen",
+      "S5e_Inceptiv_TestCase1_Stimulation_Screen",
+      "A4P_Inceptiv_TestCase1_Stimulation_Screen",
+
+      "S2_Percept_PC_DBS_TestCase1_Stimulation_Screen",
+      "S5e_Percept_PC_DBS_TestCase1_Stimulation_Screen",
+      "A4P_Percept_PC_DBS_TestCase1_Stimulation_Screen",
+
+      "S2_Percept_RC_DBS_TestCase1_Stimulation_Screen",
+      "S5e_Percept_RC_DBS_TestCase1_Stimulation_Screen",
+      "A4P_Percept_RC_DBS_TestCase1_Stimulation_Screen",
+
+      "A4P_Altaviva_TestCase2_Stimulation_Screen"
+    ]
+  },
+  {
+    "step": "Verify the Capture refill screen and therapy after the connection is established",
+    "cases": [
+      "S2_SynchroMed_II_TestCase1_Refill_Screen",
+      "S2_SynchroMed_III_TestCase1_Refill_Screen",
+      "S5e_SynchroMed_II_TestCase1_Refill_Screen",
+      "S5e_SynchroMed_III_TestCase1_Refill_Screen",
+      "A4P_SynchroMed_II_TestCase1_Refill_Screen",
+      "A4P_SynchroMed_III_TestCase1_Refill_Screen"
+    ]
+  },
+  {
+    "step": "Verify the Capture home screen after the connection is established",
+    "cases": [
+      "S2_Stim_Trialing_TestCase1_Home_Screen",
+      "S5e_Stim_Trialing_TestCase1_Home_Screen",
+      "A4P_Stim_Trialing_TestCase1_Home_Screen"
+    ]
+  },
+  {
+    "step": "Verify the Capture stimulation screen after the connection is established",
+    "cases": [
+      "S2_Stim_Trialing_TestCase1_Stimulation_Screen",
+      "S5e_Stim_Trialing_TestCase1_Stimulation_Screen",
+      "A4P_Stim_Trialing_TestCase1_Stimulation_Screen"
+    ]
+  },
+  {
+    "step": "Verifying the Device Found Screen",
+    "cases": [
+      "A4P_Altaviva_TestCase2_Device_Found_Screen"
+    ]
+  },
+  {
+    "step": "Verifying the Capture recharger about screen",
+    "cases": [
+      "S2_Restore_TestCase3_Recharger_Screen1",
+      "S2_Restore_TestCase3_Recharger_Screen2",
+      "S5e_Restore_TestCase3_Recharger_Screen1",
+      "S5e_Restore_TestCase3_Recharger_Screen2",
+      "A4P_Restore_TestCase3_Recharger_Screen1",
+      "A4P_Restore_TestCase3_Recharger_Screen2",
+
+      "S2_Intellis_TestCase3_Recharger_Screen1",
+      "S2_Intellis_TestCase3_Recharger_Screen2",
+      "S5e_Intellis_TestCase3_Recharger_Screen1",
+      "S5e_Intellis_TestCase3_Recharger_Screen2",
+      "A4P_Intellis_TestCase3_Recharger_Screen1",
+      "A4P_Intellis_TestCase3_Recharger_Screen2",
+
+      "S2_Inceptiv_TestCase3_Recharger_Screen1",
+      "S2_Inceptiv_TestCase3_Recharger_Screen2",
+      "S5e_Inceptiv_TestCase3_Recharger_Screen1",
+      "S5e_Inceptiv_TestCase3_Recharger_Screen2",
+      "A4P_Inceptiv_TestCase3_Recharger_Screen1",
+      "A4P_Inceptiv_TestCase3_Recharger_Screen2",
+
+      "S2_Percept_RC_DBS_TestCase3_Recharger_Screen1",
+      "S2_Percept_RC_DBS_TestCase3_Recharger_Screen2",
+      "S5e_Percept_RC_DBS_TestCase3_Recharger_Screen1",
+      "S5e_Percept_RC_DBS_TestCase3_Recharger_Screen2",
+      "A4P_Percept_RC_DBS_TestCase3_Recharger_Screen1",
+      "A4P_Percept_RC_DBS_TestCase3_Recharger_Screen2",
+
+      "A4P_Altaviva_TestCase2_Recharger_Setting_Screen"
+    ]
+  },
+  {
+    "step": "Verify Check that the logs can be opened in the Adobe pdf reader",
+    "cases": [
+      "S2_SynchroMed_II_TestCase4_Adobe_Screen",
+      "S2_SynchroMed_III_TestCase4_Adobe_Screen",
+      "S5e_SynchroMed_II_TestCase4_Adobe_Screen",
+      "S5e_SynchroMed_III_TestCase4_Adobe_Screen",
+      "A4P_SynchroMed_II_TestCase4_Adobe_Screen",
+      "A4P_SynchroMed_III_TestCase4_Adobe_Screen",
+
+      "S2_Stim_Trialing_TestCase4_Adobe_Screen",
+      "S5e_Stim_Trialing_TestCase4_Adobe_Screen",
+      "A4P_Stim_Trialing_TestCase4_Adobe_Screen",
+
+      "S2_Vanta_TestCase4_Adobe_Screen",
+      "S5e_Vanta_TestCase4_Adobe_Screen",
+      "A4P_Vanta_TestCase4_Adobe_Screen",
+
+      "S2_Restore_TestCase4_Adobe_Screen",
+      "S5e_Restore_TestCase4_Adobe_Screen",
+      "A4P_Restore_TestCase4_Adobe_Screen",
+
+      "S2_Intellis_TestCase4_Adobe_Screen",
+      "S5e_Intellis_TestCase4_Adobe_Screen",
+      "A4P_Intellis_TestCase4_Adobe_Screen",
+
+      "S2_Inceptiv_TestCase4_Adobe_Screen",
+      "S5e_Inceptiv_TestCase4_Adobe_Screen",
+      "A4P_Inceptiv_TestCase4_Adobe_Screen",
+
+      "S2_Percept_PC_DBS_TestCase4_Adobe_Screen",
+      "S5e_Percept_PC_DBS_TestCase4_Adobe_Screen",
+      "A4P_Percept_PC_DBS_TestCase4_Adobe_Screen",
+
+      "S2_Percept_RC_DBS_TestCase4_Adobe_Screen",
+      "S5e_Percept_RC_DBS_TestCase4_Adobe_Screen",
+      "A4P_Percept_RC_DBS_TestCase4_Adobe_Screen",
+
+      "A4P_Altaviva_TestCase4_Adobe_Screen"
+    ]
+  },
+  {
+    "step": "Verifying the Therapy application should not be uninstalled and Capture error screen that shows that the uninstallation is not allowed",
+    "cases": [
+      "S2_SynchroMed_II_TestCase8A_Notification_Screen",
+      "S2_SynchroMed_III_TestCase8A_Notification_Screen",
+      "S5e_SynchroMed_II_TestCase8A_Notification_Screen",
+      "S5e_SynchroMed_III_TestCase8A_Notification_Screen",
+      "A4P_SynchroMed_II_TestCase8A_Notification_Screen",
+      "A4P_SynchroMed_III_TestCase8A_Notification_Screen",
+
+      "S2_Stim_Trialing_TestCase8A_Notification_Screen",
+      "S5e_Stim_Trialing_TestCase8A_Notification_Screen",
+      "A4P_Stim_Trialing_TestCase8A_Notification_Screen",
+
+      "S2_Vanta_TestCase8A_Notification_Screen",
+      "S5e_Vanta_TestCase8A_Notification_Screen",
+      "A4P_Vanta_TestCase8A_Notification_Screen",
+
+      "S2_Restore_TestCase8A_Notification_Screen",
+      "S5e_Restore_TestCase8A_Notification_Screen",
+      "A4P_Restore_TestCase8A_Notification_Screen",
+
+      "S2_Intellis_TestCase8A_Notification_Screen",
+      "S5e_Intellis_TestCase8A_Notification_Screen",
+      "A4P_Intellis_TestCase8A_Notification_Screen",
+
+      "S2_Inceptiv_TestCase8A_Notification_Screen",
+      "S5e_Inceptiv_TestCase8A_Notification_Screen",
+      "A4P_Inceptiv_TestCase8A_Notification_Screen",
+
+      "S2_Percept_PC_DBS_TestCase8A_Notification_Screen",
+      "S5e_Percept_PC_DBS_TestCase8A_Notification_Screen",
+      "A4P_Percept_PC_DBS_TestCase8A_Notification_Screen",
+
+      "S2_Percept_RC_DBS_TestCase8A_Notification_Screen",
+      "S5e_Percept_RC_DBS_TestCase8A_Notification_Screen",
+      "A4P_Percept_RC_DBS_TestCase8A_Notification_Screen",
+
+      "A4P_Altaviva_TestCase8A_Notification_Screen",
+      "A4P_SureTune_TestCase8A_Notification_Screen",
+      "A4P_DBS_PatientDemo_TestCase8A_Notification_Screen"
+    ]
+  },
+  {
+    "step": "Verifying the Random app does not get installed in the tablet and Capture the screenshot that shows the app from google play store is prevented from installation",
+    "cases": [
+      "TestCase8B_Play_Store_Screen"
+    ]
+  }
+]

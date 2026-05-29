@@ -376,6 +376,9 @@ def create_base_driver(serial):
     # Samsung stability
     options.allow_running_instrumentation = True
     options.ignore_hidden_api_policy_error = True
+    
+    options.set_capability("skipServerInstallation", True) 
+    options.set_capability("skipDeviceInitialization", True)
 
     options.uiautomator2_server_launch_timeout = 180000
     options.uiautomator2_server_install_timeout = 180000
@@ -475,7 +478,9 @@ def extract_uat_and_group_id(serial):
 
     # CRITICAL FIX
     options.dont_stop_app_on_reset = True
-    options.skip_server_installation = True
+    #options.skip_server_installation = True
+    options.set_capability("skipServerInstallation", True)
+    options.set_capability("skipDeviceInitialization", True)
 
     # REQUIRED for Samsung Hub after Settings
     options.uiautomator2_server_launch_timeout = 180000
@@ -523,6 +528,7 @@ def extract_uat_and_group_id(serial):
         log("HUB", f"Error during enrollment extraction: {e}")
         return "N/A", "N/A", "N/A"
     finally:
+        clear_recent_apps_ui(driver)
         driver.quit()
         log("HUB", "Hub session closed")
 
@@ -611,34 +617,52 @@ def fill_table_for_s5e(doc_path, info, top_screenshot=None, bottom_screenshot=No
 # --------------------------------------------------
 # CLEANUP
 # --------------------------------------------------
-def clear_recent_apps_ui(serial):
-    options = UiAutomator2Options()
-    options.platform_name = "Android"
-    options.device_name = serial
-    options.no_reset = True   # IMPORTANT
-    # DO NOT set app_package / app_activity
+# def clear_recent_apps_ui(serial):
+    # options = UiAutomator2Options()
+    # options.platform_name = "Android"
+    # options.device_name = serial
+    # options.no_reset = True   # IMPORTANT
+    # # DO NOT set app_package / app_activity
 
-    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    # driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+
+    # try:
+        # # print("Opening Recent Apps…")
+        # log("CLEANUP", "Opening Recent Apps")
+        # driver.press_keycode(187)
+        # time.sleep(3)
+
+        # clear_all = WebDriverWait(driver, 10).until(
+            # EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+        # )
+        # clear_all.click()
+        # # print("Recent apps cleared via UI.")
+        # log("CLEANUP", "Recent apps cleared")
+
+    # except Exception as e:
+        # print(f"No recent apps to clear or UI not found: {e}")
+
+    # finally:
+        # driver.quit()
+        
+
+def clear_recent_apps_ui(driver):
 
     try:
-        # print("Opening Recent Apps…")
         log("CLEANUP", "Opening Recent Apps")
         driver.press_keycode(187)
         time.sleep(3)
-
         clear_all = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@text='Close all' or @text='Clear all']")
+            )
         )
+
         clear_all.click()
-        # print("Recent apps cleared via UI.")
         log("CLEANUP", "Recent apps cleared")
 
     except Exception as e:
         print(f"No recent apps to clear or UI not found: {e}")
-
-    finally:
-        driver.quit()
-
 
 # ====== Main Integration ======
 
@@ -680,7 +704,7 @@ def main():
         software_bottom
     )
 
-    clear_recent_apps_ui(device_serial)
+    #clear_recent_apps_ui(device_serial)
 
     # print("All steps complete.")
     log("RESULT", "Automation completed successfully")

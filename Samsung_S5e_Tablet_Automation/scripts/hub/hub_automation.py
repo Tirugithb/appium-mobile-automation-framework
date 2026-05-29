@@ -147,6 +147,8 @@ def get_driver_for_hub(serial):
     # ADD – allow attach since Hub is already launched via adb
     options.allow_running_instrumentation = True
     options.ignore_hidden_api_policy_error = True
+    options.set_capability("skipServerInstallation", True)
+    options.set_capability("skipDeviceInitialization", True)
 
     # return webdriver.Remote("http://localhost:4723", options=options)
     return webdriver.Remote("http://127.0.0.1:4723", options=options)
@@ -293,35 +295,50 @@ def update_or_install_apps(driver):
 # --------------------------------------------------
 # CLEANUP
 # --------------------------------------------------
-def clear_recent_apps_ui(serial):
-    options = UiAutomator2Options()
-    options.platform_name = "Android"
-    options.device_name = serial
-    options.no_reset = True  # IMPORTANT
-    # DO NOT set app_package / app_activity
+# def clear_recent_apps_ui(serial):
+    # options = UiAutomator2Options()
+    # options.platform_name = "Android"
+    # options.device_name = serial
+    # options.no_reset = True  # IMPORTANT
+    # # DO NOT set app_package / app_activity
 
-    # driver = webdriver.Remote("http://localhost:4723", options=options)
-    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    # # driver = webdriver.Remote("http://localhost:4723", options=options)
+    # driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+
+    # try:
+        # # print("Opening Recent Apps…")
+        # log("CLEANUP", "Opening recent apps")
+        # driver.press_keycode(187)
+        # time.sleep(3)
+
+        # clear_all = WebDriverWait(driver, 10).until(
+            # EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+        # )
+        # clear_all.click()
+        # # print("Recent apps cleared via UI.")
+        # log("CLEANUP", "Recent apps cleared")
+
+    # except Exception as e:
+        # print(f"No recent apps to clear or UI not found: {e}")
+
+    # finally:
+        # driver.quit()
+
+def clear_recent_apps_ui(driver):
 
     try:
-        # print("Opening Recent Apps…")
         log("CLEANUP", "Opening recent apps")
         driver.press_keycode(187)
         time.sleep(3)
-
         clear_all = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@text='Close all' or @text='Clear all']")
+            )
         )
         clear_all.click()
-        # print("Recent apps cleared via UI.")
         log("CLEANUP", "Recent apps cleared")
-
     except Exception as e:
         print(f"No recent apps to clear or UI not found: {e}")
-
-    finally:
-        driver.quit()
-
 
 # ====== Main Integration ======
 
@@ -349,11 +366,13 @@ def main():
             time.sleep(5)
             update_or_install_apps(driver)
     finally:
-        driver.quit()
+        #driver.quit()
         # print("Hub app session closed.")
         log("HUB", "Hub session closed")
 
-    clear_recent_apps_ui(device_serial)
+    #clear_recent_apps_ui(device_serial)
+    clear_recent_apps_ui(driver)
+    driver.quit()
 
     # print("All steps complete.")
     log("RESULT", "Hub automation completed successfully")

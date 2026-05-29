@@ -10,9 +10,6 @@ import shutil
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.actions.pointer_input import PointerInput
-from selenium.webdriver.common.actions.action_builder import ActionBuilder
-from selenium.webdriver.common.actions import interaction
 
 RUN_TS = datetime.now().strftime("%Y%m%d_%H%M%S")
 SCRIPT_START_TIME = time.time()
@@ -140,77 +137,35 @@ def capture_recent_apps_screenshot():
     # Return to Home
     driver.press_keycode(3)
 
-# def open_app_drawer():
-#
-#     driver.press_keycode(3)
-#     time.sleep(1)
-#
-#     size = driver.get_window_size()
-#
-#     # simple swipe up (this was working earlier)
-#     perform_swipe(
-#         driver,
-#         int(size["width"] * 0.5),
-#         int(size["height"] * 0.9),
-#         int(size["width"] * 0.5),
-#         int(size["height"] * 0.2),
-#         150
-#     )
-#
-#     time.sleep(2)
-#
-#     # simple validation
-#     apps = driver.find_elements("xpath", "//android.widget.TextView")
-#
-#     if len(apps) > 5:
-#         log("SUCCESS", "App Drawer opened")
-#         return True
-#
-#     log("ERROR", "App Drawer not opened")
-#     return False
-
 def open_app_drawer():
 
-    log("S2", "Opening Apps using Apps icon")
+    driver.press_keycode(3)
+    time.sleep(1)
 
-    try:
+    size = driver.get_window_size()
 
-        # Go to Home screen
-        driver.press_keycode(3)
+    # simple swipe up (this was working earlier)
+    perform_swipe(
+        driver,
+        int(size["width"] * 0.5),
+        int(size["height"] * 0.9),
+        int(size["width"] * 0.5),
+        int(size["height"] * 0.2),
+        150
+    )
 
-        time.sleep(2)
+    time.sleep(2)
 
-        # --------------------------------------------------
-        # CLICK APPS ICON
-        # --------------------------------------------------
-        apps_icon = driver.find_element(
-            "xpath",
-            "//android.widget.TextView[@text='Apps']"
-        )
+    # simple validation
+    apps = driver.find_elements("xpath", "//android.widget.TextView")
 
-        apps_icon.click()
-
-        log("S2", "Clicked Apps icon")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # VALIDATION
-        # --------------------------------------------------
-        # --------------------------------------------------
-        # SIMPLE WAIT AFTER CLICK
-        # --------------------------------------------------
-        time.sleep(3)
-
-        log("SUCCESS", "Apps screen opened")
-
+    if len(apps) > 5:
+        log("SUCCESS", "App Drawer opened")
         return True
 
-    except Exception as e:
+    log("ERROR", "App Drawer not opened")
+    return False
 
-        log("S2", f"Failed to open Apps screen: {e}")
-
-        return False
 
 def capture_app_pages():
 
@@ -303,49 +258,28 @@ def capture_app_pages():
 
 def go_to_first_app_page():
 
-    log("S2", "Moving to first Apps page")
+    size = driver.get_window_size()
 
-    try:
+    for _ in range(5):  # increased attempts
 
-        for _ in range(5):
+        before = driver.page_source
 
-            before = driver.page_source
+        perform_swipe(
+            driver,
+            int(size["width"] * 0.10),
+            int(size["height"] * 0.5),
+            int(size["width"] * 0.90),
+            int(size["height"] * 0.5),
+            200
+        )
 
-            subprocess.run(
-                [
-                    "adb",
-                    "-s",
-                    device_serial,
-                    "shell",
-                    "input",
-                    "swipe",
-                    "300",
-                    "700",
-                    "1500",
-                    "700",
-                    "500"
-                ],
-                check=True
-            )
+        time.sleep(1)
 
-            time.sleep(2)
+        after = driver.page_source
 
-            after = driver.page_source
-
-            # --------------------------------------------------
-            # STOP IF ALREADY AT FIRST PAGE
-            # --------------------------------------------------
-            if before == after:
-
-                log("S2", "Already at first Apps page")
-
-                break
-
-        log("S2", "Reached first Apps page")
-
-    except Exception as e:
-
-        log("S2", f"Failed moving to first page: {e}")
+        # stop if already at first page
+        if before == after:
+            break
 
 # --------------------------------------------------
 # Resolve device
@@ -393,29 +327,28 @@ options.no_reset = True
 driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
 
 PERMISSION_APPS = {
-        "Adobe Acrobat": "com.adobe.reader" ,
-        "Xerox Print Service": "com.xerox.printservice" ,
-        "Epson iPrint": "epson.print" ,
-        "HP Print Service Plugin": "com.hp.android.printservice" ,
-        "Content": "com.airwatch.contentlocker" ,
-        "Gallery": "com.sec.android.gallery3d" ,
-        "Web": "com.airwatch.browser" ,
-        "Mopria Print Service": "org.mopria.printplugin" ,
-        "Samsung Print Service Plugin": "com.sec.app.samsungprintservice" ,
-        "Zoom": "us.zoom.videomeetings"
-
+        "Adobe Acrobat": "com.adobe.reader"
+        # "Xerox Print Service": "com.xerox.printservice",
+        # "Epson iPrint": "epson.print",
+        # "HP Print Service Plugin": "com.hp.android.printservice",
+        # "Content": "com.airwatch.contentlocker",
+        # "Gallery": "com.sec.android.gallery3d",
+        # "Web": "com.airwatch.browser",
+        # "Mopria Print Service": "org.mopria.printplugin",
 }
 
 NON_PERMISSION_APPS = {
-    "Brother Print Service Plugin": "com.brother.printservice" ,
-    "Calculator": "com.sec.android.app.popupcalculator" ,
-    "Camera": "com.sec.android.app.camera" ,
-    "Canon Print Service": "jp.co.canon.android.printservice.plugin" ,
-    "Clock": "com.sec.android.app.clockpackage" ,
-    "Google Play Store": "com.android.vending" ,
-    "Hub": "com.airwatch.androidagent" ,
-    "My Files": "com.sec.android.app.myfiles",
-    "Chrome": "com.android.chrome"
+    "Brother Print Service Plugin": "com.brother.printservice"
+    # "Calculator": "com.sec.android.app.popupcalculator",
+    # "Camera": "com.sec.android.app.camera",
+    # "Canon Print Service": "jp.co.canon.android.printservice.plugin",
+    # "Clock": "com.sec.android.app.clockpackage",
+    # "Google Play Store": "com.android.vending",
+    # "Hub": "com.airwatch.androidagent",
+    # "My Files": "com.sec.android.app.myfiles"
+    # # "Chrome"
+    # # "Samsung Print Service Plugin"
+    # # "Zoom"
 }
 
 # --------------------------------------------------
@@ -844,7 +777,7 @@ def handle_content_flow(driver):
 
     log("CONTENT", "Starting Content setup flow")
 
-    wait = WebDriverWait(driver, 40)
+    wait = WebDriverWait(driver, 60)
 
     try:
 
@@ -941,25 +874,21 @@ def handle_gallery_flow(driver):
 
     try:
 
-        wait = WebDriverWait(driver, 15)
+        time.sleep(5)
 
-        # Wait for ALLOW button
-        allow_btn = wait.until(
-            EC.element_to_be_clickable(
-                (
-                    By.XPATH,
-                    "//*[@text='ALLOW' or @text='Allow']"
-                )
-            )
+        # --------------------------------------------------
+        # LOCATION POPUP : Allow
+        # --------------------------------------------------
+        allow_btn = driver.find_element(
+            "xpath",
+            "//*[@text='Allow']"
         )
-
-        log("GALLERY", "ALLOW popup detected")
 
         allow_btn.click()
 
-        log("GALLERY", "Clicked ALLOW")
+        log("GALLERY", "Clicked Allow")
 
-        time.sleep(2)
+        time.sleep(3)
 
         log("GALLERY", "Gallery flow completed")
 
@@ -989,10 +918,7 @@ def handle_web_flow(driver):
 
             understand_btn = wait.until(
                 EC.element_to_be_clickable(
-                    (
-                        By.XPATH,
-                        "//*[@text='I UNDERSTAND' or @text='I Understand']"
-                    )
+                    (By.XPATH, "//*[@text='I UNDERSTAND']")
                 )
             )
 
@@ -1003,7 +929,6 @@ def handle_web_flow(driver):
             time.sleep(5)
 
         except:
-
             log("WEB", "I UNDERSTAND not found")
 
         # --------------------------------------------------
@@ -1013,10 +938,7 @@ def handle_web_flow(driver):
 
             agree_btn = wait.until(
                 EC.element_to_be_clickable(
-                    (
-                        By.XPATH,
-                        "//*[@text='I AGREE' or @text='I Agree']"
-                    )
+                    (By.XPATH, "//*[@text='I AGREE']")
                 )
             )
 
@@ -1027,78 +949,10 @@ def handle_web_flow(driver):
             time.sleep(5)
 
         except:
-
             log("WEB", "I AGREE not found")
 
-        # --------------------------------------------------
-        # STEP 3 : REMEMBER CHOICE + PROCEED
-        # --------------------------------------------------
-        try:
 
-            time.sleep(3)
-
-            log("WEB", "Handling PROCEED popup")
-
-            # --------------------------------------------------
-            # CHECKBOX : Remember choice
-            # --------------------------------------------------
-            try:
-
-                checkbox = driver.find_element(
-                    "xpath",
-                    "//android.widget.CheckBox"
-                )
-
-                checkbox.click()
-
-                log("WEB", "Checked Remember choice")
-
-                time.sleep(2)
-
-            except:
-
-                log("WEB", "Remember choice checkbox not found")
-
-            # --------------------------------------------------
-            # CLICK PROCEED
-            # --------------------------------------------------
-            proceed_elements = driver.find_elements(
-                "xpath",
-                "//*[contains(@text,'PROCEED') or contains(@text,'Proceed')]"
-            )
-
-            if proceed_elements:
-
-                proceed_btn = proceed_elements[0]
-
-                log("WEB", "PROCEED button detected")
-
-                try:
-
-                    proceed_btn.click()
-
-                except:
-
-                    # Fallback coordinate tap
-                    loc = proceed_btn.location
-                    size = proceed_btn.size
-
-                    x = loc['x'] + size['width'] // 2
-                    y = loc['y'] + size['height'] // 2
-
-                    driver.tap([(x, y)])
-
-                log("WEB", "Clicked PROCEED")
-
-                time.sleep(5)
-
-            else:
-
-                log("WEB", "PROCEED button not found")
-
-        except Exception as e:
-
-            log("WEB", f"PROCEED step failed: {e}")
+        log("WEB", "Web app flow completed")
 
     except Exception as e:
 
@@ -1177,197 +1031,49 @@ def handle_adobe_flow(driver):
         time.sleep(5)
 
         # --------------------------------------------------
-        # STEP 1 : First Continue
-        # --------------------------------------------------
-        continue_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[@text='Continue']")
-            )
-        )
-
-        continue_btn.click()
-
-        log("ADOBE", "Clicked first Continue")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # STEP 2 : Second Continue
-        # --------------------------------------------------
-        continue_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[@text='Continue']")
-            )
-        )
-
-        continue_btn.click()
-
-        log("ADOBE", "Clicked second Continue")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # STEP 3 : Third Continue
-        # --------------------------------------------------
-        continue_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[@text='Continue']")
-            )
-        )
-
-        continue_btn.click()
-
-        log("ADOBE", "Clicked third Continue")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # STEP 4 : Not Now
+        # STEP 1 : Click X close button
         # --------------------------------------------------
         try:
 
-            not_now_btn = wait.until(
+            # Try content-desc first
+            close_btn = wait.until(
                 EC.element_to_be_clickable(
                     (
                         By.XPATH,
-                        "//*[contains(@text,'Not now') or contains(@text,'Not Now')]"
+                        "//*[@content-desc='Close' or @content-desc='Cancel']"
                     )
                 )
             )
 
-            not_now_btn.click()
+            close_btn.click()
 
-            log("ADOBE", "Clicked Not Now")
+            log("ADOBE", "Clicked X button using content-desc")
 
             time.sleep(3)
 
-        except Exception as e:
+        except:
 
-            log("ADOBE", f"Not Now button failed: {e}")
+            log("ADOBE", "Content-desc X not found")
+
+            # --------------------------------------------------
+            # Fallback : Tap top-right corner
+            # --------------------------------------------------
+            size = driver.get_window_size()
+
+            x = int(size['width'] * 0.95)
+            y = int(size['height'] * 0.10)
+
+            driver.tap([(x, y)])
+
+            log("ADOBE", "Tapped X button using coordinates")
+
+            time.sleep(3)
 
         log("ADOBE", "Adobe flow completed")
 
     except Exception as e:
 
         log("ADOBE", f"Adobe flow failed: {e}")
-
-def handle_samsung_print_service_flow(driver):
-
-    log("SAMSUNG_PRINT", "Starting Samsung Print Service flow")
-
-    try:
-
-        time.sleep(5)
-
-        # --------------------------------------------------
-        # SWIPE THROUGH ONBOARDING PAGES
-        # --------------------------------------------------
-        for i in range(4):
-
-            log("SAMSUNG_PRINT", f"Swiping to page {i + 1}")
-
-            subprocess.run(
-                [
-                    "adb",
-                    "-s",
-                    device_serial,
-                    "shell",
-                    "input",
-                    "swipe",
-                    "1500",
-                    "700",
-                    "300",
-                    "700",
-                    "500"
-                ],
-                check=True
-            )
-
-            time.sleep(4)
-
-        log("SAMSUNG_PRINT", "Reached agreement screen")
-
-        # --------------------------------------------------
-        # SELECT CHECKBOX 1
-        # --------------------------------------------------
-        checkbox1 = driver.find_element(
-            "xpath",
-            "(//android.widget.CheckBox)[1]"
-        )
-
-        checkbox1.click()
-
-        log("SAMSUNG_PRINT", "Selected checkbox 1")
-
-        time.sleep(2)
-
-        # --------------------------------------------------
-        # SELECT CHECKBOX 2
-        # --------------------------------------------------
-        checkbox2 = driver.find_element(
-            "xpath",
-            "(//android.widget.CheckBox)[2]"
-        )
-
-        checkbox2.click()
-
-        log("SAMSUNG_PRINT", "Selected checkbox 2")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # CLICK OK
-        # --------------------------------------------------
-        ok_btn = driver.find_element(
-            "xpath",
-            "//*[@text='OK' or @text='Ok']"
-        )
-
-        ok_btn.click()
-
-        log("SAMSUNG_PRINT", "Clicked OK")
-
-        time.sleep(5)
-
-        log("SAMSUNG_PRINT", "Samsung Print Service flow completed")
-
-    except Exception as e:
-
-        log("SAMSUNG_PRINT", f"Flow failed: {e}")
-
-def handle_zoom_flow(driver):
-
-    log("ZOOM", "Starting Zoom setup flow")
-
-    wait = WebDriverWait(driver, 30)
-
-    try:
-
-        time.sleep(5)
-
-        # --------------------------------------------------
-        # CLICK "Continue to use"
-        # --------------------------------------------------
-        continue_btn = wait.until(
-            EC.element_to_be_clickable(
-                (
-                    By.XPATH,
-                    "//*[contains(@text,'Continue to use')]"
-                )
-            )
-        )
-
-        continue_btn.click()
-
-        log("ZOOM", "Clicked Continue to use")
-
-        time.sleep(5)
-
-        log("ZOOM", "Zoom flow completed")
-
-    except Exception as e:
-
-        log("ZOOM", f"Zoom flow failed: {e}")
 
 def open_apps():
     global SCREENSHOT_COUNT
@@ -1464,12 +1170,6 @@ def open_apps():
             elif name == "Adobe Acrobat":
                 handle_adobe_flow(driver)
 
-            elif name == "Samsung Print Service Plugin":
-                handle_samsung_print_service_flow(driver)
-
-            elif name == "Zoom":
-                handle_zoom_flow(driver)
-
             state = driver.query_app_state(pkg)
 
             if state in [3, 4]:
@@ -1483,105 +1183,105 @@ def open_apps():
             log("ERROR", f"{name} failed: {e}")
             failed.append(name)
 
-    # --------------------------------------------------
-    # FINAL STEPS
-    # --------------------------------------------------
-    try:
-        driver.press_keycode(3)
-        log("TABLET", "Returned to Home screen")
-    except:
-        log("ERROR", "Driver crashed before HOME")
-
-    capture_recent_apps_screenshot()
-    page_count = capture_app_pages()
-
-    open_app_and_capture(
-        "Google Play Store",
-        "com.android.vending",
-        "TestCase8B_Play_Store_Screen"
-    )
-
-    try:
-
-        log("HUB", "Opening Hub Enrollment page")
-
-        driver.activate_app("com.airwatch.androidagent")
-
-        time.sleep(8)
-
-        # --------------------------------------------------
-        # Profile
-        # --------------------------------------------------
-        profile_icon = driver.find_element(
-            "id",
-            "com.airwatch.androidagent:id/user_initials_tv"
-        )
-
-        profile_icon.click()
-
-        log("HUB", "Clicked Profile")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # This Device
-        # --------------------------------------------------
-        device_entry = driver.find_element(
-            "id",
-            "com.airwatch.androidagent:id/device_tv"
-        )
-
-        device_entry.click()
-
-        log("HUB", "Clicked This Device")
-
-        time.sleep(3)
-
-        # --------------------------------------------------
-        # Enrollment
-        # --------------------------------------------------
-        enrollment = driver.find_element(
-            "xpath",
-            "//android.widget.TextView[@text='Enrollment']"
-        )
-
-        enrollment.click()
-
-        log("HUB", "Opened Enrollment page")
-
-        time.sleep(5)
-
-        # --------------------------------------------------
-        # Screenshot
-        # --------------------------------------------------
-        screenshot_path = os.path.join(
-            RUN_SCREENSHOT_DIR,
-            "Hub_Enrollment_Details.png"
-        )
-
-        driver.save_screenshot(screenshot_path)
-
-        SCREENSHOT_COUNT += 1
-
-        log("SCREENSHOT", f"Hub screenshot saved: {screenshot_path}")
-
-        driver.press_keycode(3)
-
-    except Exception as e:
-
-        log("HUB", f"Hub screenshot failed: {e}")
-
-    log("DEBUG", f"Opened apps list: {opened}")
-
-    log("RESULT", f"Apps opened successfully: {len(opened)}")
-    log("RESULT", f"Apps failed: {len(failed)}")
-
-    if failed:
-        log("WARNING", f"Failed apps: {failed}")
-    else:
-        log("RESULT", "All target apps verified successfully")
-
-    print_test_summary(opened, failed, page_count)
+    # # --------------------------------------------------
+    # # FINAL STEPS
+    # # --------------------------------------------------
+    # try:
+    #     driver.press_keycode(3)
+    #     log("TABLET", "Returned to Home screen")
+    # except:
+    #     log("ERROR", "Driver crashed before HOME")
+    #
+    # capture_recent_apps_screenshot()
+    # page_count = capture_app_pages()
+    #
+    # open_app_and_capture(
+    #     "Google Play Store",
+    #     "com.android.vending",
+    #     "TestCase8B_Play_Store_Screen"
+    # )
+    #
+    # try:
+    #
+    #     log("HUB", "Opening Hub Enrollment page")
+    #
+    #     driver.activate_app("com.airwatch.androidagent")
+    #
+    #     time.sleep(8)
+    #
+    #     # --------------------------------------------------
+    #     # Profile
+    #     # --------------------------------------------------
+    #     profile_icon = driver.find_element(
+    #         "id",
+    #         "com.airwatch.androidagent:id/user_initials_tv"
+    #     )
+    #
+    #     profile_icon.click()
+    #
+    #     log("HUB", "Clicked Profile")
+    #
+    #     time.sleep(3)
+    #
+    #     # --------------------------------------------------
+    #     # This Device
+    #     # --------------------------------------------------
+    #     device_entry = driver.find_element(
+    #         "id",
+    #         "com.airwatch.androidagent:id/device_tv"
+    #     )
+    #
+    #     device_entry.click()
+    #
+    #     log("HUB", "Clicked This Device")
+    #
+    #     time.sleep(3)
+    #
+    #     # --------------------------------------------------
+    #     # Enrollment
+    #     # --------------------------------------------------
+    #     enrollment = driver.find_element(
+    #         "xpath",
+    #         "//android.widget.TextView[@text='Enrollment']"
+    #     )
+    #
+    #     enrollment.click()
+    #
+    #     log("HUB", "Opened Enrollment page")
+    #
+    #     time.sleep(5)
+    #
+    #     # --------------------------------------------------
+    #     # Screenshot
+    #     # --------------------------------------------------
+    #     screenshot_path = os.path.join(
+    #         RUN_SCREENSHOT_DIR,
+    #         "Hub_Enrollment_Details.png"
+    #     )
+    #
+    #     driver.save_screenshot(screenshot_path)
+    #
+    #     SCREENSHOT_COUNT += 1
+    #
+    #     log("SCREENSHOT", f"Hub screenshot saved: {screenshot_path}")
+    #
+    #     driver.press_keycode(3)
+    #
+    # except Exception as e:
+    #
+    #     log("HUB", f"Hub screenshot failed: {e}")
+    #
+    # log("DEBUG", f"Opened apps list: {opened}")
+    #
+    # log("RESULT", f"Apps opened successfully: {len(opened)}")
+    # log("RESULT", f"Apps failed: {len(failed)}")
+    #
+    # if failed:
+    #     log("WARNING", f"Failed apps: {failed}")
+    # else:
+    #     log("RESULT", "All target apps verified successfully")
+    #
+    # print_test_summary(opened, failed, page_count)
 
 # --------------------------------------------------
 # Execution

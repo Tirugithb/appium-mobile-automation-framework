@@ -102,6 +102,10 @@ def get_settings_driver(serial):
     options.app_package = "com.android.settings"
     options.app_activity = "com.android.settings.Settings"
     options.no_reset = True
+    
+    options.set_capability("skipServerInstallation", True)
+    options.set_capability("skipDeviceInitialization", True)
+    
     # ADD – required for Samsung / slow instrumentation
     options.uiautomator2_server_launch_timeout = 180000
     options.uiautomator2_server_install_timeout = 180000
@@ -274,6 +278,28 @@ def scroll_to_top_left(driver, max_swipes=3):
     for _ in range(max_swipes):
         swipe_up_left_side(driver)
         time.sleep(2)
+        
+
+def clear_recent_apps_ui(driver):
+
+    try:
+        log("CLEANUP", "Opening Recent Apps")
+        driver.press_keycode(187)
+        time.sleep(3)
+        clear_all = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "//*[@text='Close all' or @text='Clear all' or contains(@content-desc,'Clear')]"
+                )
+            )
+        )
+
+        clear_all.click()
+        log("CLEANUP", "Recent apps cleared")
+
+    except Exception as e:
+        print(f"No recent apps to clear or UI not found: {e}")
 
 
 # ========== Start Process ==========
@@ -285,7 +311,8 @@ find_and_click_apps(driver)
 
 apps_to_find = ["Adobe Acrobat", "Brother Print Service Plugin", "Calculator", "Camera", "Canon Print Service", "Clock",
                 "Connector", "Content", "Epson iPrint", "Gallery", "Google Play Store", "HP Print Service Plugin",
-                "Hub", "Mopria Print Service", "My Files", "Teams", "Web", "Xerox Print Service"]
+                "Hub",
+                "Mopria Print Service", "My Files", "Teams", "Web", "Xerox Print Service"]
 app_data = []
 
 for app_name in apps_to_find:
@@ -301,41 +328,41 @@ for app_name in apps_to_find:
         log("SETTINGS APPS", f"{app_name:<30} : N/A")
         app_data.append({"App": app_name, "Version": "N/A"})
 
+clear_recent_apps_ui(driver)
 driver.quit()
 
 
 # --------------------------------------------------
 # CLEANUP
 # --------------------------------------------------
-def clear_recent_apps_ui(serial):
-    options = UiAutomator2Options()
-    options.platform_name = "Android"
-    options.device_name = serial
-    options.no_reset = True  # IMPORTANT
-    # DO NOT set app_package / app_activity
+# def clear_recent_apps_ui(serial):
+    # options = UiAutomator2Options()
+    # options.platform_name = "Android"
+    # options.device_name = serial
+    # options.no_reset = True  # IMPORTANT
+    # # DO NOT set app_package / app_activity
 
-    # driver = webdriver.Remote("http://localhost:4723", options=options)
-    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    # # driver = webdriver.Remote("http://localhost:4723", options=options)
+    # driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
 
-    try:
-        # print("Opening Recent Apps…")
-        log("CLEANUP", "Opening Recent Apps")
-        driver.press_keycode(187)
-        time.sleep(3)
+    # try:
+        # # print("Opening Recent Apps…")
+        # log("CLEANUP", "Opening Recent Apps")
+        # driver.press_keycode(187)
+        # time.sleep(3)
 
-        clear_all = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[@text='Close all' or @text='Clear all' or contains(@content-desc,'Clear')]")))
-        clear_all.click()
-        # print("Recent apps cleared via UI.")
-        log("CLEANUP", "Recent apps cleared")
+        # clear_all = WebDriverWait(driver, 10).until(
+            # EC.element_to_be_clickable(
+                # (By.XPATH, "//*[@text='Close all' or @text='Clear all' or contains(@content-desc,'Clear')]")))
+        # clear_all.click()
+        # # print("Recent apps cleared via UI.")
+        # log("CLEANUP", "Recent apps cleared")
 
-    except Exception as e:
-        print(f"No recent apps to clear or UI not found: {e}")
+    # except Exception as e:
+        # print(f"No recent apps to clear or UI not found: {e}")
 
-    finally:
-        driver.quit()
-
+    # finally:
+        # driver.quit()        
 
 # ========== Save to Excel ==========
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -436,7 +463,7 @@ else:
     log("DOCUMENT", "Word document updated successfully")
     log("DOCUMENT", output_word_path)
 
-    clear_recent_apps_ui(device_serial)
+    #clear_recent_apps_ui(device_serial)
     log("RESULT", "S5E extraction completed successfully")
 
 
