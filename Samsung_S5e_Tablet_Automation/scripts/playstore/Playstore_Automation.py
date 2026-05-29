@@ -149,6 +149,9 @@ options.android_install_timeout = 180000
 options.allow_running_instrumentation = True
 options.ignore_hidden_api_policy_error = True
 
+options.set_capability("skipServerInstallation", True)
+options.set_capability("skipDeviceInitialization", True)
+
 # --------------------------------------------------
 # Launch Play Store BEFORE driver
 # --------------------------------------------------

@@ -226,9 +226,13 @@ def extract_uat_group_and_apps(serial):
     options.app_package = "com.airwatch.androidagent"
     options.app_activity = "com.airwatch.agent.Hub.hostactivity.HostActivity"
 
-    options.no_reset = True
+    options.no_reset = True    
     options.dont_stop_app_on_reset = True
-    options.skip_server_installation = True
+    
+    #options.skip_server_installation = True
+    options.set_capability("skipServerInstallation", True)
+    options.set_capability("skipDeviceInitialization", True)
+    
     options.allow_running_instrumentation = True
     options.ignore_hidden_api_policy_error = True
 
@@ -303,6 +307,7 @@ def extract_uat_group_and_apps(serial):
             scroll_down(driver)
 
     finally:
+        clear_recent_apps_ui(driver)
         driver.quit()
         log("HUB", "Appium session closed")
 
@@ -312,34 +317,50 @@ def extract_uat_group_and_apps(serial):
 # --------------------------------------------------
 # CLEANUP
 # --------------------------------------------------
-def clear_recent_apps_ui(serial):
-    options = UiAutomator2Options()
-    options.platform_name = "Android"
-    options.device_name = serial
-    options.no_reset = True  # IMPORTANT
-    # DO NOT set app_package / app_activity
+# def clear_recent_apps_ui(serial):
+    # options = UiAutomator2Options()
+    # options.platform_name = "Android"
+    # options.device_name = serial
+    # options.no_reset = True  # IMPORTANT
+    # # DO NOT set app_package / app_activity
 
-    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    # driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+
+    # try:
+        # # print("Opening Recent Apps…")
+        # log("CLEANUP", "Opening Recent Apps")
+        # driver.press_keycode(187)
+        # time.sleep(3)
+
+        # clear_all = WebDriverWait(driver, 10).until(
+            # EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+        # )
+        # clear_all.click()
+        # # print("Recent apps cleared via UI.")
+        # log("CLEANUP", "Recent apps cleared")
+
+    # except Exception as e:
+        # print(f"No recent apps to clear or UI not found: {e}")
+
+    # finally:
+        # driver.quit()        
+
+def clear_recent_apps_ui(driver):
 
     try:
-        # print("Opening Recent Apps…")
         log("CLEANUP", "Opening Recent Apps")
         driver.press_keycode(187)
         time.sleep(3)
-
         clear_all = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[@text='Close all' or @text='Clear all']")
+            )
         )
+
         clear_all.click()
-        # print("Recent apps cleared via UI.")
         log("CLEANUP", "Recent apps cleared")
-
     except Exception as e:
-        print(f"No recent apps to clear or UI not found: {e}")
-
-    finally:
-        driver.quit()
-
+        print(f"No recent apps to clear or UI not found: {e}")  
 
 # --------------------------------------------------
 # MAIN
@@ -353,6 +374,6 @@ if __name__ == "__main__":
 
     fill_into_word_table(versions, group)
 
-    clear_recent_apps_ui(device)
+    #clear_recent_apps_ui(device)    
 
     log("RESULT", "Extraction complete for S5E")

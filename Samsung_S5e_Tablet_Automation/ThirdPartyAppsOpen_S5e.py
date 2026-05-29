@@ -325,6 +325,9 @@ options.device_name = device_serial
 options.udid = device_serial
 options.no_reset = True
 
+options.set_capability("skipServerInstallation", True)
+options.set_capability("skipDeviceInitialization", True)
+
 driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
 
 PERMISSION_APPS = {
