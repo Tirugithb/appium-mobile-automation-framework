@@ -1,0 +1,332 @@
+import os
+import time
+import subprocess
+from datetime import datetime
+
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from docx import Document
+from docx.shared import RGBColor
+from packaging import version
+import sys
+
+sys.stdout.reconfigure(encoding="utf-8")
+
+# add project root
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+# --------------------------------------------------
+# CORE IMPORTS
+# --------------------------------------------------
+from core.device_registry import is_device_allowed, get_device_name
+from core.adb_utils import (
+    get_connected_device_serial,
+    is_device_locked,
+    unlock_device_with_password
+)
+from core.config_loader import load_device_password
+
+
+# --------------------------------------------------
+# LOGGING
+# --------------------------------------------------
+def log(section, message):
+    ts = datetime.now().strftime("%H:%M:%S")
+    print(f"[{ts}] [{section:<14}] {message}")
+
+
+# --------------------------------------------------
+# DEVICE RESOLUTION & UNLOCK
+# --------------------------------------------------
+device_serial = os.environ.get("DEVICE_SERIAL") or get_connected_device_serial()
+
+if not is_device_allowed(device_serial):
+    raise RuntimeError(f"Unauthorized A4P device connected: {device_serial}")
+
+device_name = get_device_name(device_serial)
+log("DEVICE", f"Authorized device detected: {device_name} ({device_serial})")
+
+if is_device_locked():
+    unlock_device_with_password(load_device_password())
+else:
+    log("DEVICE", "Device already unlocked")
+    
+    
+# --------------------------------------------------
+# START APPIUM
+# --------------------------------------------------
+from appiumManager.appium_manager import AppiumManager
+AppiumManager.start()
+
+# --------------------------------------------------
+# CONSTANTS
+# --------------------------------------------------
+# DOC_PATH = r"C:\Users\mandat3\OneDrive - Medtronic PLC\Desktop\Appium\App Ver Auto Fill\NDHF1500-221664_Jan_2026_Protocol.docx"
+# DOC_PATH = r"C:\Users\mohami32\OneDrive - Medtronic PLC\Desktop\Appium\App Ver Auto Fill\NDHF1500-221664_Jan_2026_Protocol.docx"
+DOC_PATH = r"C:\Users\SVC-Systems-TestPC\OneDrive - Medtronic PLC\Protocol\NDHF1500-221664_CP_Latest_Protocol.docx"
+
+APP_NAME_MAPPING = {
+    "DBS Clinician Application (A610)": "DBS",
+    "DBS Patient Demo (A620)": "DBS Patient Demo",
+    "SureTune 4 Connector (A90400)": "SureTune™ 4 Connector",
+    "SynchroMed Clinician Application (A810)": "SynchroMed™",
+    "Restore Clinician Application (A71100)": "Restore",
+    "Vanta Clinician Application (A71200)": "Vanta",
+    "Stim Trialing Clinician Application (A71300)": "Stim Trialing",
+    "Intellis Clinician Application (A710)": "Intellis",
+    "Inceptiv Clinician Application (A71400)": "Inceptiv",
+    "Altaviva Clinician Application (P7850N)": "Altaviva Clinician",
+    "Recharger Application (A90300)": "Recharger Application",
+    "Communication Manager (A901)": "Medtronic Communication Manager",
+    "PDS (A902)": "Patient Data Service"
+}
+
+
+# --------------------------------------------------
+# DEVICE DETECTION
+# --------------------------------------------------
+def get_all_connected_devices():
+    output = subprocess.check_output("adb devices", shell=True).decode().strip()
+    return [line.split()[0] for line in output.splitlines()[1:] if "device" in line]
+
+
+def get_device_model(serial):
+    try:
+        return subprocess.check_output(
+            f"adb -s {serial} shell getprop ro.product.model", shell=True
+        ).decode().strip()
+    except:
+        return None
+
+
+def wait_for_device_model(target_model, prompt="Connect device"):
+    log("DEVICE", f"{prompt} ({target_model})")
+    while True:
+        for serial in get_all_connected_devices():
+            if get_device_model(serial) == target_model:
+                log("DEVICE", f"{target_model} connected: {serial}")
+                return serial
+        time.sleep(2)
+
+
+# --------------------------------------------------
+# HUB HELPERS
+# --------------------------------------------------
+def force_stop_and_launch_hub(serial):
+    log("HUB", f"Launching Hub on {serial}")
+
+    subprocess.run(
+        f"adb -s {serial} shell am force-stop com.airwatch.androidagent",
+        shell=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    subprocess.run(
+        f"adb -s {serial} shell monkey -p com.airwatch.androidagent "
+        f"-c android.intent.category.LAUNCHER 1",
+        shell=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    time.sleep(5)
+
+
+def scroll_down(driver):
+    driver.execute_script("mobile: scrollGesture", {
+        "left": 100,
+        "top": 300,
+        "width": 600,
+        "height": 800,
+        "direction": "down",
+        "percent": 0.85
+    })
+    time.sleep(1)
+
+
+# --------------------------------------------------
+# WORD DOC UPDATE
+# --------------------------------------------------
+def fill_group_id_below_aw_group(doc, group_id):
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for para in cell.paragraphs:
+                    if para.text.strip().startswith("A4P:"):
+                        para.clear()
+                        para.add_run("A4P: ")
+                        run = para.add_run(group_id)
+                        run.font.color.rgb = RGBColor(0, 128, 0)
+
+
+def fill_into_word_table(app_versions, group_id):
+    doc = Document(DOC_PATH)
+
+    for table in doc.tables:
+        for row in table.rows[1:]:
+            if len(row.cells) < 6:
+                continue
+
+            doc_app = row.cells[1].text.strip()
+            tablet_app = APP_NAME_MAPPING.get(doc_app)
+            if not tablet_app:
+                continue
+
+            version_value = app_versions.get(tablet_app, "N/A")
+            cell = row.cells[4]
+            cell.text = version_value
+
+            if cell.paragraphs and cell.paragraphs[0].runs:
+                run = cell.paragraphs[0].runs[0]
+                run.font.color.rgb = RGBColor(0, 128, 0) if version_value != "N/A" else RGBColor(255, 0, 0)
+
+    fill_group_id_below_aw_group(doc, group_id)
+    doc.save(DOC_PATH)
+    # log("DOCUMENT", f"A4P versions filled and saved")
+    log("DOCUMENT", f"A4P versions filled and saved: {DOC_PATH}")
+
+
+# --------------------------------------------------
+# EXTRACTION LOGIC
+# --------------------------------------------------
+def extract_uat_group_and_apps(serial):
+    force_stop_and_launch_hub(serial)
+    time.sleep(5)
+
+    options = UiAutomator2Options()
+    options.platform_name = "Android"
+    options.device_name = serial
+    options.automation_name = "UiAutomator2"
+    options.app_package = "com.airwatch.androidagent"
+    options.app_activity = "com.airwatch.agent.Hub.hostactivity.HostActivity"
+
+    options.no_reset = True
+    options.dont_stop_app_on_reset = True
+    options.skip_server_installation = True
+    options.allow_running_instrumentation = True
+    options.ignore_hidden_api_policy_error = True
+
+    options.uiautomator2_server_launch_timeout = 180000
+    options.uiautomator2_server_install_timeout = 180000
+    options.adb_exec_timeout = 180000
+    options.android_install_timeout = 180000
+
+    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+
+    wait = WebDriverWait(driver, 30)
+
+    # REQUIRED UI READY CHECK
+    wait.until(
+        EC.presence_of_element_located(
+            (By.ID, "com.airwatch.androidagent:id/user_initials_tv")
+        )
+    )
+    log("HUB", "Hub UI ready")
+
+    app_versions = {}
+    uat = group_id = "N/A"
+
+    try:
+        wait.until(EC.element_to_be_clickable((By.ID, "com.airwatch.androidagent:id/user_initials_tv"))).click()
+        wait.until(EC.element_to_be_clickable((By.ID, "com.airwatch.androidagent:id/device_tv"))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//android.widget.TextView[@text='Enrollment']"))).click()
+
+        values = driver.find_elements(By.ID, "com.airwatch.androidagent:id/listview_value")
+        if len(values) >= 2:
+            uat = values[0].text.strip()
+            group_id = values[1].text.strip()
+            log("HUB", f"UAT: {uat} | Group ID: {group_id}")
+
+        driver.find_element(By.XPATH, "//android.widget.ImageButton[@content-desc='Back']").click()
+
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//android.widget.TextView[@text='Managed Apps']"))).click()
+
+        last_seen = ""
+        stable_count = 0
+
+        while True:
+            containers = driver.find_elements(
+                By.XPATH,
+                "//android.widget.LinearLayout[android.widget.TextView[@resource-id='com.airwatch.androidagent:id/app_name']]"
+            )
+
+            new_found = False
+            for c in containers:
+                try:
+                    name = c.find_element(By.ID, "com.airwatch.androidagent:id/app_name").text.strip()
+                    ver = c.find_element(By.ID, "com.airwatch.androidagent:id/app_version").text.strip()
+                    if name and name not in app_versions:
+                        app_versions[name] = ver
+                        log("HUB APPS", f"{name} - {ver}")
+                        new_found = True
+                except:
+                    pass
+
+            last = list(app_versions.keys())[-1] if app_versions else ""
+            if last == last_seen:
+                stable_count += 1
+            else:
+                stable_count = 0
+                last_seen = last
+
+            if not new_found or stable_count >= 2:
+                break
+
+            scroll_down(driver)
+
+    finally:
+        driver.quit()
+        log("HUB", "Appium session closed")
+
+    return uat, group_id, app_versions
+
+
+# --------------------------------------------------
+# CLEANUP
+# --------------------------------------------------
+def clear_recent_apps_ui(serial):
+    options = UiAutomator2Options()
+    options.platform_name = "Android"
+    options.device_name = serial
+    options.no_reset = True  # IMPORTANT
+    # DO NOT set app_package / app_activity
+
+    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+
+    try:
+        # print("Opening Recent Apps…")
+        log("CLEANUP", "Opening Recent Apps")
+        driver.press_keycode(187)
+        time.sleep(3)
+
+        clear_all = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//*[@text='Close all' or @text='Clear all']"))
+        )
+        clear_all.click()
+        # print("Recent apps cleared via UI.")
+        log("CLEANUP", "Recent apps cleared")
+
+    except Exception as e:
+        print(f"No recent apps to clear or UI not found: {e}")
+
+    finally:
+        driver.quit()
+
+
+# --------------------------------------------------
+# MAIN
+# --------------------------------------------------
+if __name__ == "__main__":
+    log("INIT", "Starting extraction for A4P")
+
+    device = wait_for_device_model("SM-T630", "Connect A4P tablet")
+    uat, group, versions = extract_uat_group_and_apps(device)
+    fill_into_word_table(versions, group)
+    clear_recent_apps_ui(device_serial)
+
+    log("RESULT", "Extraction complete for A4P")
